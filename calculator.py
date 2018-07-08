@@ -97,7 +97,7 @@ class Interpreter(object):
         left = None;
         token_eval = 0;
         while (self.current_token.type == INTEGER):
-            token_eval += (token_eval * 10) + self.current_token.value
+            token_eval = (token_eval * 10) + self.current_token.value
             self.eat(INTEGER)
 
         # current token will be an int
@@ -114,7 +114,7 @@ class Interpreter(object):
         token_eval = 0 
         right = None
         while (self.current_token.type == INTEGER):
-            token_eval += (token_eval * 10) + self.current_token.value
+            token_eval = (token_eval * 10) + self.current_token.value
             self.eat(INTEGER)
 
         right = Token(INTEGER, token_eval)
