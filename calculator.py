@@ -2,13 +2,13 @@
 #
 # EOF (end-of-file) token is used to indicate that 
 # there is no more input left for lexical analysis
-INTEGER, PLUS, EOF = 'INTGER', 'PLUS', 'EOF'
+INTEGER, PLUS, EOF, MINUS = 'INTEGER', 'PLUS', 'EOF', 'MINUS'
 
 class Token(object):
     def __init__(self, type, value):
         #token type: INTEGER, PLUS, EOF
         self.type = type
-        #token value: 0 ... 9, '+', or none
+        #token value: 0 ... 9, '+', or '-' or NONE
         self.value = value
 
     def __str__(self):
@@ -67,6 +67,11 @@ class Interpreter(object):
             self.pos += 1
             return token
 
+        if current_char == '-':
+            token = Token(MINUS, current_char)
+            self.pos += 1
+            return token
+
         self.error()
     
     def eat(self, token_type):
@@ -78,26 +83,41 @@ class Interpreter(object):
             self.current_token = self.get_next_token()
         else:
             self.error()
+    
+    def no_space(self):
+        self.text = self.text.replace(" ", "")
 
     def expr(self):
         """ expression -> INTEGER PLUS INTEGER """
         # set current token to the first token taken
         # from the input
+        self.no_space()
         self.current_token = self.get_next_token()
 
-        # we expect the current token to be a single-digit
-        # integer
-        left = self.current_token
-        self.eat(INTEGER)
+        left = None;
+        token_eval = 0;
+        while (self.current_token.type == INTEGER):
+            token_eval += (token_eval * 10) + self.current_token.value
+            self.eat(INTEGER)
 
-        # we expect the current token to be a '+' token
+        # current token will be an int
+        left = Token(INTEGER, token_eval)
+
+        # we expect the current token to be either a '+' || '-' token
         op = self.current_token
-        self.eat(PLUS)
+        if (self.current_token.value == '+'):
+            self.eat(PLUS)
+        else:
+            self.eat(MINUS)
 
-        # we expect the current token to be a single-digit
-        # integer
-        right = self.current_token
-        self.eat(INTEGER)
+        # We expect token to be int as well
+        token_eval = 0 
+        right = None
+        while (self.current_token.type == INTEGER):
+            token_eval += (token_eval * 10) + self.current_token.value
+            self.eat(INTEGER)
+
+        right = Token(INTEGER, token_eval)
 
         # after the above call, the self.current token
         # is set to EOF token
@@ -107,8 +127,8 @@ class Interpreter(object):
         # method can just return the result of adding
         # two integers, thus effectively interpreting
         # client input
-        result = left.value + right.value
-        return result
+        return left.value - right.value if (op.type == MINUS) else left.value + right.value
+        
 
 def main():
     while True:
