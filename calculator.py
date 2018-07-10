@@ -2,7 +2,15 @@
 #
 # EOF (end-of-file) token is used to indicate that 
 # there is no more input left for lexical analysis
-INTEGER, PLUS, EOF, MINUS = 'INTEGER', 'PLUS', 'EOF', 'MINUS'
+INTEGER, PLUS, EOF, MINUS, MUL, DIV = 'INTEGER', 'PLUS', 'EOF', 'MINUS', 'MULTIPLY', 'DIVIDE'
+
+
+'''
+Extend the calculator to handle multiplication of two integers
+Extend the calculator to handle division of two integers
+Modify the code to interpret expressions containing an arbitrary number of additions and subtractions, for example “9 - 5 + 3 + 11”
+
+'''
 
 class Token(object):
     def __init__(self, type, value):
