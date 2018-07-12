@@ -72,7 +72,8 @@ class Interpreter(object):
             self.pos += 1
             return token
 
-        if current_char == 'x':
+
+        if current_char == '*':
             token = Token(MUL, current_char)
             self.pos += 1
             return token
@@ -128,9 +129,9 @@ class Interpreter(object):
             op = self.current_token
             if (self.current_token.value == '+'):
                 self.eat(PLUS)
-            elif(self.current_token == 'x'):
+            elif(self.current_token.value == '*'):
                 self.eat(MUL)
-            elif(self.current_token == '/'):
+            elif(self.current_token.value == '/'):
                 self.eat(DIV)
             else:
                 self.eat(MINUS)
