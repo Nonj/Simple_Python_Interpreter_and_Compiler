@@ -114,7 +114,7 @@ class Interpreter(object):
         # from the input
         self.no_space()
         self.current_token = self.get_next_token()
-        result = 0
+        result = Token(INTEGER, 0)
         left = None
         token_eval = 0
         while (self.current_token.type == INTEGER):
@@ -146,19 +146,19 @@ class Interpreter(object):
             right = Token(INTEGER, token_eval)
 
             if (op.type == PLUS):
-                result += left.value + right.value
+                result.value = left.value + right.value
             elif(op.type == MUL):
-                result += left.value * right.value
+                result.value = left.value * right.value
             elif(op.type == DIV):
-                result += left.value / right.value
+                result.value = left.value / right.value
             else:
-                result += left.value - right.value
-            left = Token(INTEGER, 0)
+                result.value = left.value - right.value
+            left = result
 
         # after the above call, the self.current token
         # is set to EOF token
 
-        return result
+        return result.value
 
 
 def main():
