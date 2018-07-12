@@ -1,6 +1,6 @@
 # Token types
 #
-# EOF (end-of-file) token is used to indicate that 
+# EOF (end-of-file) token is used to indicate that
 # there is no more input left for lexical analysis
 INTEGER, PLUS, EOF, MINUS, MUL, DIV = 'INTEGER', 'PLUS', 'EOF', 'MINUS', 'MULTIPLY', 'DIVIDE'
 
@@ -12,11 +12,12 @@ Modify the code to interpret expressions containing an arbitrary number of addit
 
 '''
 
+
 class Token(object):
     def __init__(self, type, value):
-        #token type: INTEGER, PLUS, EOF
+        # token type: INTEGER, PLUS, EOF
         self.type = type
-        #token value: 0 ... 9, '+', or '-' or NONE
+        # token value: 0 ... 9, '+', or '-' or NONE
         self.value = value
 
     def __str__(self):
@@ -29,9 +30,10 @@ class Token(object):
             type=self.type,
             value=repr(self.value)
         )
-    
+
     def __repr__(self):
         return self.__str__()
+
 
 class Interpreter(object):
     def __init__(self, text):
@@ -52,24 +54,34 @@ class Interpreter(object):
         text = self.text
 
         # is self.pos index past the ned of the self.text?
-        # if so, return EOF token because there is no more 
-        #input left to convert into tokens
+        # if so, return EOF token because there is no more
+        # input left to convert into tokens
         if self.pos > len(text) - 1:
             return Token(EOF, None)
-        
+
         # get a character at the position self.pos and decide
         # what token to create based on the single character
         current_char = text[self.pos]
 
         # if the characeter is a digit, then convert it
         # to integer, create an INTEGER token, increment
-        # self.pos index to point to the next character 
+        # self.pos index to point to the next character
         # after the digit, and return the INTEGER token
         if current_char.isdigit():
             token = Token(INTEGER, int(current_char))
             self.pos += 1
             return token
-        
+
+        if current_char == 'x':
+            token = Token(MUL, current_char)
+            self.pos += 1
+            return token
+
+        if current_char == '/':
+            token = Token(DIV, current_char)
+            self.pos += 1
+            return token
+
         if current_char == '+':
             token = Token(PLUS, current_char)
             self.pos += 1
@@ -81,7 +93,7 @@ class Interpreter(object):
             return token
 
         self.error()
-    
+
     def eat(self, token_type):
         # compare the current token type with the passed
         # token type, and if they match, then "eat" the
@@ -91,7 +103,7 @@ class Interpreter(object):
             self.current_token = self.get_next_token()
         else:
             self.error()
-    
+
     def no_space(self):
         self.text = self.text.replace(" ", "")
 
@@ -101,9 +113,9 @@ class Interpreter(object):
         # from the input
         self.no_space()
         self.current_token = self.get_next_token()
-
-        left = None;
-        token_eval = 0;
+        result = 0
+        left = None
+        token_eval = 0
         while (self.current_token.type == INTEGER):
             token_eval = (token_eval * 10) + self.current_token.value
             self.eat(INTEGER)
@@ -111,32 +123,42 @@ class Interpreter(object):
         # current token will be an int
         left = Token(INTEGER, token_eval)
 
-        # we expect the current token to be either a '+' || '-' token
-        op = self.current_token
-        if (self.current_token.value == '+'):
-            self.eat(PLUS)
-        else:
-            self.eat(MINUS)
+        while(self.current_token.type != EOF):
+            # we expect the current token to be either a '+' || '-' token
+            op = self.current_token
+            if (self.current_token.value == '+'):
+                self.eat(PLUS)
+            elif(self.current_token == 'x'):
+                self.eat(MUL)
+            elif(self.current_token == '/'):
+                self.eat(DIV)
+            else:
+                self.eat(MINUS)
 
-        # We expect token to be int as well
-        token_eval = 0 
-        right = None
-        while (self.current_token.type == INTEGER):
-            token_eval = (token_eval * 10) + self.current_token.value
-            self.eat(INTEGER)
+                # We expect token to be int as well
+            token_eval = 0
+            right = None
+            while (self.current_token.type == INTEGER):
+                token_eval = (token_eval * 10) + self.current_token.value
+                self.eat(INTEGER)
 
-        right = Token(INTEGER, token_eval)
+            right = Token(INTEGER, token_eval)
+
+            if (op.type == PLUS):
+                result += left.value + right.value
+            elif(op.type == MUL):
+                result += left.value * right.value
+            elif(op.type == DIV):
+                result += left.value / right.value
+            else:
+                result += left.value - right.value
+            left = Token(INTEGER, 0)
 
         # after the above call, the self.current token
         # is set to EOF token
 
-        # At this point, INTEGER plus INTEGER sequence of
-        # tokens has been successfully found and the 
-        # method can just return the result of adding
-        # two integers, thus effectively interpreting
-        # client input
-        return left.value - right.value if (op.type == MINUS) else left.value + right.value
-        
+        return result
+
 
 def main():
     while True:
@@ -149,6 +171,7 @@ def main():
         interpreter = Interpreter(text)
         result = interpreter.expr()
         print(result)
+
 
 if __name__ == '__main__':
     main()
