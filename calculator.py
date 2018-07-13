@@ -157,7 +157,6 @@ class Interpreter(object):
 
         # after the above call, the self.current token
         # is set to EOF token
-
         return result.value
 
 
