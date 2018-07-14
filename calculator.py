@@ -111,7 +111,7 @@ class Interpreter(object):
     def expr(self):
         """ expression -> INTEGER PLUS INTEGER """
         # set current token to the first token taken
-        # from the input
+        # from the inputs
         self.no_space()
         self.current_token = self.get_next_token()
         result = Token(INTEGER, 0)
